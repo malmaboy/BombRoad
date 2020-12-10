@@ -14,19 +14,19 @@ int main(){
 /// Verifica a escolha do utilizador 
 void menu(){
 	puts("+-----------------------------------------------------");
-	puts("|reads <filename> - read input file");
-	puts("|show - show the mine map");
-	puts("|trigger <x> <y> - trigger mine at <x> <y>");
-	puts("|plant <x> <y> - place armed mine at <x> <y>");
-	puts("|export <filename> - save file with current map");
-	puts("|quit - exit program");
+	puts("read <filename>     - read input file");
+	puts("show                - show the mine map");
+	puts("trigger <x> <y>     - trigger mine at <x> <y>");
+	puts("plant <x> <y>       - place armed mine at <x> <y>");
+	puts("export <filename>   - save file with current map");
+	puts("quit                - exit program");
 	puts("+-----------------------------------------------------");
 }
 
 void choices(){
 
 	char choice[20];
-	int i = 0;
+	int i = 1;
 
 
 
@@ -35,55 +35,36 @@ void choices(){
 		printf(">");
 		gets(choice);
 			
-			// verifica se as strings são iguais
+			// compares the input with the menu options
 			if (strcmp(choice,"read") == 0)
 			{
-				i = 1;
-				
+				//readfile()
 			}
-			if(strcmp(choice,"show") == 0)
+			else if(strcmp(choice,"show") == 0)
 			{
-				i = 2;
+				//printmap()
 			}
-			if(strcmp(choice,"trigger") == 0)
+			else if(strcmp(choice,"trigger") == 0)
 			{
-				i = 3;
 			}
-			if(strcmp(choice,"plant") == 0)
+			else if(strcmp(choice,"plant") == 0)
 			{
-				i = 4;
 			}
-			if(strcmp(choice,"export") == 0)
+			else if(strcmp(choice,"export") == 0)
 			{
-				i = 5;
 			}
-			if(strcmp(choice,"quit") == 0){
-				i = 6;
+			else if(strcmp(choice,"quit") == 0)
+			{
 			}
-			
-
-
-		switch (i)
-		{
-			case 1: // read
-				printf("hello");
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6: // quit
-				break;
-		default:
-			printf("Inputs errados");
-			break;
-		}
-	} while (i != 6);
-	
+			else if(strcmp(choice,"sos") == 0)
+			{
+				menu();
+			}
+			else 
+			{
+				printf("Inputs errados")
+			}
+	} while (i != 0);
 }
 
 void readFile(){
