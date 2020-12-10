@@ -3,6 +3,7 @@
 
 void menu();
 void choices();
+void readFile();
 
 int main(){
 	menu();
@@ -78,9 +79,14 @@ void choices(){
 			case 6: // quit
 				break;
 		default:
+			printf("Inputs errados");
 			break;
 		}
 	} while (i != 6);
 	
+}
+
+void readFile(){
+
 }
 
