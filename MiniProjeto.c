@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <string.h>
+# include <stdlib.h>
 
 void menu();
 void choices();
@@ -38,7 +39,8 @@ void choices(){
 			// compares the input with the menu options
 			if (strcmp(choice,"read") == 0)
 			{
-				//readfile()
+				readFile();
+				
 			}
 			else if(strcmp(choice,"show") == 0)
 			{
@@ -52,6 +54,7 @@ void choices(){
 			}
 			else if(strcmp(choice,"export") == 0)
 			{
+
 			}
 			else if(strcmp(choice,"quit") == 0)
 			{
@@ -62,12 +65,43 @@ void choices(){
 			}
 			else 
 			{
-				printf("Inputs errados")
+				printf("Inputs errados");
 			}
 	} while (i != 0);
 }
 
+// Lê o ficheiro
 void readFile(){
+	int ch;
+	//Apontador para o ficheiro 
+	FILE *file;
+	// nome do ficheiro
+	char filename[200];
+	// localização do ficheiro
+	gets(filename);
+
+	//Abre o ficheiro
+	file = fopen(filename,"r");
+
+	// Verifica se o ficheiro é valido
+
+	if(filename == NULL){
+		printf("Impossivel abrir o ficheiro %s", filename);
+	}
+	else
+	{
+		
+		//Imprime tudo que está no ficheiro
+		while ((ch = fgetc(file)) != EOF)
+		{
+			putchar(ch);
+		}
+		
+		fclose(file);
+		
+	}
+	
+
 
 }
 
