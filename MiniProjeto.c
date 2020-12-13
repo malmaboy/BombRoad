@@ -2,9 +2,10 @@
 # include <string.h>
 # include <stdlib.h>
 
+
 void menu();
 void choices();
-void readFile();
+void readFile(filename);
 
 int main(){
 	menu();
@@ -28,18 +29,18 @@ void choices(){
 
 	char choice[20];
 	int i = 1;
-
-
-
+	char filename[200];
+	
 	do
 	{
-		printf(">");
-		gets(choice);
-			
+		printf("\n>");
+		// lê a escolha e o path do ficheiro
+		///scanf("%s%s",choice, filename );
+		if(scanf("\n%s%s",&choice, &filename )){
 			// compares the input with the menu options
-			if (strcmp(choice,"read") == 0)
+			if(strcmp(choice,"read") == 0)
 			{
-				readFile();
+				readFile(filename);
 				
 			}
 			else if(strcmp(choice,"show") == 0)
@@ -58,6 +59,7 @@ void choices(){
 			}
 			else if(strcmp(choice,"quit") == 0)
 			{
+				exit(1);
 			}
 			else if(strcmp(choice,"sos") == 0)
 			{
@@ -67,18 +69,29 @@ void choices(){
 			{
 				printf("Inputs errados");
 			}
+
+		}
+		else if(scanf("%s",&choice)){
+			if(strcmp(choice,"quit") == 0)
+			{
+				exit(1);
+			}
+		}
+		
+			
+		
+			
 	} while (i != 0);
 }
 
 // Lê o ficheiro
-void readFile(){
+void readFile(char filename[200]){
 	int ch;
 	//Apontador para o ficheiro 
 	FILE *file;
+
 	// nome do ficheiro
-	char filename[200];
 	// localização do ficheiro
-	gets(filename);
 
 	//Abre o ficheiro
 	file = fopen(filename,"r");
@@ -93,8 +106,9 @@ void readFile(){
 		
 		//Imprime tudo que está no ficheiro
 		while ((ch = fgetc(file)) != EOF)
-		{
-			putchar(ch);
+		{ 
+			mineposition(ch);
+			
 		}
 		
 		fclose(file);
@@ -103,5 +117,26 @@ void readFile(){
 	
 
 
+}
+
+int mineposition(int ch){
+	int x1 = 0;
+	int y2 = 0;
+
+	
+
+	int position[10][10];
+
+	for( int x = 0; x < ch;x++){
+		for(int y = 0; y < ch;y++){
+			fscanf("%d",position[x1][y2]);
+			
+		}
+                                                                   
+	}
+	
+	printf("%d%d\n", position);
+
+	return 0;
 }
 
