@@ -1,15 +1,18 @@
 # include <stdio.h>
 # include <string.h>
 # include <stdlib.h>
+#define MAX 25
 
 
 void menu();
 void choices();
 void readFile(filename);
+int grelha();
 
 int main(){
 	menu();
 	choices();
+	
 }	
 
 /// Imprime o menu
@@ -36,11 +39,16 @@ void choices(){
 		printf("\n>");
 		// lê a escolha e o path do ficheiro
 		///scanf("%s%s",choice, filename );
-		if(scanf("\n%s%s",&choice, &filename )){
+		if(scanf("\n%s",&choice)){
 			// compares the input with the menu options
 			if(strcmp(choice,"read") == 0)
 			{
-				readFile(filename);
+				if(scanf("%s", &filename)){
+					readFile(filename);
+
+				}
+			
+				
 				
 			}
 			else if(strcmp(choice,"show") == 0)
@@ -65,18 +73,13 @@ void choices(){
 			{
 				menu();
 			}
-			else 
+			else
 			{
-				printf("Inputs errados");
+				printf("Inputs errados.\n");
 			}
 
 		}
-		else if(scanf("%s",&choice)){
-			if(strcmp(choice,"quit") == 0)
-			{
-				exit(1);
-			}
-		}
+		
 		
 			
 		
@@ -86,7 +89,10 @@ void choices(){
 
 // Lê o ficheiro
 void readFile(char filename[200]){
-	int ch;
+	int *chx;
+	int *chy;
+	int x;
+	
 	//Apontador para o ficheiro 
 	FILE *file;
 
@@ -103,40 +109,48 @@ void readFile(char filename[200]){
 	}
 	else
 	{
-		
+		x = grelha();
 		//Imprime tudo que está no ficheiro
-		while ((ch = fgetc(file)) != EOF)
+		while (fscanf(file,"%d %d",&chx, &chy)!= EOF)
 		{ 
-			mineposition(ch);
+			printf("x%dy%d\n", chx, chy);
+
+			x [chx][chy] = 1;
 			
+
+
 		}
 		
 		fclose(file);
 		
 	}
 	
-
-
-}
-
-int mineposition(int ch){
-	int x1 = 0;
-	int y2 = 0;
-
-	
-
-	int position[10][10];
-
-	for( int x = 0; x < ch;x++){
-		for(int y = 0; y < ch;y++){
-			fscanf("%d",position[x1][y2]);
-			
-		}
-                                                                   
-	}
-	
-	printf("%d%d\n", position);
-
 	return 0;
+
 }
+
+
+// faz a grelha
+int grelha(){
+
+	int me[MAX][MAX];
+
+	
+	int i = 0;
+	int j = 0;
+
+	for (i = 0; i < 25; i++)
+	{
+		for(j = 0; j < 25; j++){
+			me[i][j] = 0;
+			printf("%d", me[i][j]);
+			 
+		}
+	}
+
+
+
+	return me;
+}
+
 

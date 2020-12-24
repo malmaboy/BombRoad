@@ -15,3 +15,5 @@
 
 
 ### Referências 
+
+- Linguagem C, Damas,L.M.D
