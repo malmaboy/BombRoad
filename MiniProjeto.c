@@ -10,6 +10,7 @@
 void menu();
 void choices();
 void readFile(char filename[200], char grid[][MAX]);
+void show(char empty[][MAX], char armed[][MAX]);
 
 int main()
 {
@@ -36,6 +37,8 @@ void choices()
     char choice[20];
     char filename[200];
     char game[MAX][MAX];
+    int count = 0;
+
 
     do
     {
@@ -50,25 +53,99 @@ void choices()
                 if (scanf("%s", &filename))
                 {
                     readFile(filename, game);
-
+                    /*
                     for (int i = 0; i < MAX; i++)
                     {
                         for (int j = 0; j < MAX; j++)
                         {
                             printf("%c", game[i][j]);
                         }
-                    }
+                    }*/
+                    count++;
                 }
             }
             else if (strcmp(choice, "show") == 0)
             {
-                //printmap();
+                for (int i = 0; i < MAX; i++){
+                    for (int j = 0; j < MAX; j++){
+                        if(count <= 0){
+                            game[i][j] = EMPTY;
+                            
+                        }
+                        else
+                        {
+                            game[i][j];
+
+                        }
+                        
+                    printf("%c", game[i][j]);
+                }
+        }
             }
             else if (strcmp(choice, "trigger") == 0)
             {
+                int posx, posy;
+                scanf("%d%d\n", &posx, &posy);
+                //Problem here
+                if((posx >= 0 && posx <= MAX)  && (posy >= 0 && posy < MAX)){
+                    
+                    int count1 = 0;
+
+                    for(int i = 0; i < MAX; i++){
+                        for (int j = 0; j < MAX; j++)
+                        {
+                            if((game[i][j] == ARMED) && (game[posx][posy] == game[i][j])){ 
+                                game[i][j] = DISARMED;
+                                printf("hello");
+                            }
+                            if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
+                                printf("no");
+                                count == 1;
+                            }
+                            
+
+
+
+                        }
+                    }
+                    printf("%d", count1);
+                    if(count == 1){
+                        printf("No mine at specified coordinate.\n");
+                        count--;
+                    }
+                }
+                ///PROBLEM HERE
+                else
+                {
+                    /// Problem here se o input for 2
+                    printf("Invalid coordinate");
+                }
+                
+
+
             }
             else if (strcmp(choice, "plant") == 0)
             {
+                int posx, posy, count2;
+                scanf("%d%d\n", &posx, &posy);
+                /*
+               for(int i = 0; i < MAX; i++)
+               {
+                    for (int j = 0; j < MAX; j++)
+                    {
+                        if((game[i][j] == DISARMED) && (game[i][j] == game[posx][posy])){ 
+                            game[i][j] = ARMED;
+                        }
+                        if((game[i][j] == ARMED) && (game[i][j] == game[posx][posy])){ 
+                            game[i][j] = ARMED;
+                        }
+                        if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
+                           count2 == 1;
+                        }
+                    }
+                }
+              */
+
             }
             else if (strcmp(choice, "export") == 0)
             {
@@ -96,6 +173,7 @@ void readFile(char filename[200], char grid[][MAX])
     int chx;
     int chy;
     int x;
+	int i, j;
 
     //Apontador para o ficheiro
     FILE *file;
@@ -114,9 +192,9 @@ void readFile(char filename[200], char grid[][MAX])
     }
     else
     {
-        for (int i = 0; i < MAX; i++)
+        for (i = 0; i < MAX; i++)
         {
-            for (int j = 0; j < MAX; j++)
+            for ( j = 0; j < MAX; j++)
             {
                 grid[i][j] = EMPTY;
             }
@@ -125,10 +203,11 @@ void readFile(char filename[200], char grid[][MAX])
         //Imprime tudo que está no ficheiro
         while (fscanf(file, "%d %d", &chx, &chy) != EOF)
         {
-            printf("%d %d\n", chx, chy);
 
             grid[chx][chy] = ARMED;
         }
         fclose(file);
     }
+	
 }
+
