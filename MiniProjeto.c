@@ -96,11 +96,9 @@ void choices()
                         {
                             if((game[i][j] == ARMED) && (game[posx][posy] == game[i][j])){ 
                                 game[i][j] = DISARMED;
-                                printf("hello");
                             }
-                            if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
-                                printf("no");
-                                count == 1;
+                            else if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
+                                count1 == 1;
                             }
                             
 
@@ -108,10 +106,9 @@ void choices()
 
                         }
                     }
-                    printf("%d", count1);
-                    if(count == 1){
+                    if(count1 == 1){
                         printf("No mine at specified coordinate.\n");
-                        count--;
+                        count1 == 0;
                     }
                 }
                 ///PROBLEM HERE
@@ -126,9 +123,9 @@ void choices()
             }
             else if (strcmp(choice, "plant") == 0)
             {
-                int posx, posy, count2;
+                int posx, posy;
                 scanf("%d%d\n", &posx, &posy);
-                /*
+                
                for(int i = 0; i < MAX; i++)
                {
                     for (int j = 0; j < MAX; j++)
@@ -140,11 +137,10 @@ void choices()
                             game[i][j] = ARMED;
                         }
                         if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
-                           count2 == 1;
+                           game[i][j] = EMPTY;
                         }
                     }
                 }
-              */
 
             }
             else if (strcmp(choice, "export") == 0)
