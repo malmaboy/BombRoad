@@ -2,16 +2,22 @@
 #include <string.h>
 #include <stdlib.h>
 
+// tamanho do array
 #define MAX 25
+// sem mina
 #define EMPTY '_'
+// mina armada
 #define ARMED '.'
+// mina desarmada
 #define DISARMED '*'
 
 void menu();
 void choices();
 void readFile(char filename[200], char grid[][MAX]);
 void show(char empty[][MAX], char armed[][MAX]);
+void writeFile(char filenameout[200]);
 
+// Main
 int main()
 {
     menu();
@@ -31,12 +37,19 @@ void menu()
     puts("+-----------------------------------------------------");
 }
 
+// Verifica a escolha do utlizador
 void choices()
 {
     int i = 1;
+    // nome da escolha
     char choice[20];
+    // nome do ficheiro 
     char filename[200];
+    // nome do ficheiro para fazer export
+    char filenameout[200];
+    // array 
     char game[MAX][MAX];
+    // variavel de ajuda para opção show
     int count = 0;
 
 
@@ -44,7 +57,6 @@ void choices()
     {
         printf("\n>");
         // lê a escolha e o path do ficheiro
-        ///scanf("%s",choice);
         if (scanf("\n%s", &choice))
         {
             // compares the input with the menu options
@@ -53,14 +65,6 @@ void choices()
                 if (scanf("%s", &filename))
                 {
                     readFile(filename, game);
-                    /*
-                    for (int i = 0; i < MAX; i++)
-                    {
-                        for (int j = 0; j < MAX; j++)
-                        {
-                            printf("%c", game[i][j]);
-                        }
-                    }*/
                     count++;
                 }
             }
@@ -85,7 +89,7 @@ void choices()
             else if (strcmp(choice, "trigger") == 0)
             {
                 int posx, posy;
-                scanf("%d%d\n", &posx, &posy);
+                scanf("%d%d", &posx, &posy);
                 //Problem here
                 if((posx >= 0 && posx <= MAX)  && (posy >= 0 && posy < MAX)){
                     
@@ -124,7 +128,7 @@ void choices()
             else if (strcmp(choice, "plant") == 0)
             {
                 int posx, posy;
-                scanf("%d%d\n", &posx, &posy);
+                scanf("%d%d", &posx, &posy);
                 
                for(int i = 0; i < MAX; i++)
                {
@@ -145,6 +149,10 @@ void choices()
             }
             else if (strcmp(choice, "export") == 0)
             {
+                if(scanf("%s", &filenameout)){
+                    writeFile(filenameout);
+                }
+
             }
             else if (strcmp(choice, "quit") == 0)
             {
@@ -166,28 +174,29 @@ void choices()
 // Lê o ficheiro
 void readFile(char filename[200], char grid[][MAX])
 {
+    // Variavel que recebe a posição x
     int chx;
+    // Variavel que recebe a posição y
     int chy;
-    int x;
+    // Variaveis que vão receber as posições do array
 	int i, j;
 
     //Apontador para o ficheiro
     FILE *file;
 
-    // nome do ficheiro
-    // localização do ficheiro
-
     //Abre o ficheiro
     file = fopen(filename, "r");
 
-    // Verifica se o ficheiro é valido
 
+    // Verifica se o ficheiro é valido
     if (filename == NULL)
     {
-        printf("Impossivel abrir o ficheiro %s", filename);
+        printf("Error opening file %s\n", filename);
     }
     else
     {
+        // Se o ficheiro for valido lê as posições que estão ficheiro 
+        // e aplica no array 
         for (i = 0; i < MAX; i++)
         {
             for ( j = 0; j < MAX; j++)
@@ -196,7 +205,7 @@ void readFile(char filename[200], char grid[][MAX])
             }
         }
 
-        //Imprime tudo que está no ficheiro
+        // recebe as posições das minas e imprime-as
         while (fscanf(file, "%d %d", &chx, &chy) != EOF)
         {
 
@@ -204,6 +213,18 @@ void readFile(char filename[200], char grid[][MAX])
         }
         fclose(file);
     }
+
 	
+}
+// cria um ficheiro novo
+void writeFile(char filenameout[200]){
+
+    // Variaveis de entrada e saída
+    FILE *filein, *fileout;
+    // int para ler o caracteres
+    int ch;
+
+   
+
 }
 
