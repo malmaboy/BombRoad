@@ -111,15 +111,13 @@ void choices()
                         }
                     }
                     if(count1 == 1){
-                        printf("No mine at specified coordinate.\n");
+                        fputs("No mine at specified coordinate", stderr);
                         count1 == 0;
                     }
                 }
-                ///PROBLEM HERE
                 else
                 {
-                    /// Problem here se o input for 2
-                    printf("Invalid coordinate");
+                    fputs("Invalid coordinate.\n",stderr);
                 }
                 
 
@@ -191,7 +189,7 @@ void readFile(char filename[200], char grid[][MAX])
     // Verifica se o ficheiro é valido
     if (filename == NULL)
     {
-        printf("Error opening file %s\n", filename);
+        fputs("Error opening file\n", stderr);
     }
     else
     {
@@ -208,7 +206,6 @@ void readFile(char filename[200], char grid[][MAX])
         // recebe as posições das minas e imprime-as
         while (fscanf(file, "%d %d", &chx, &chy) != EOF)
         {
-
             grid[chx][chy] = ARMED;
         }
         fclose(file);
@@ -222,9 +219,9 @@ void writeFile(char filenameout[200]){
     // Variaveis de entrada e saída
     FILE *filein, *fileout;
     // int para ler o caracteres
-    int ch;
+    int chx, chy;
+    int i,j;
 
-   
 
 }
 
