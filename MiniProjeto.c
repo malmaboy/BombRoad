@@ -20,8 +20,16 @@ void writeFile(char filenameout[200], char grid[][MAX]);
 // Main
 int main()
 {
+    char map[MAX][MAX];
+    for (int i = 0; i < MAX; i++)
+    {
+        for (int j = 0; j < MAX; j++)
+        {
+            map[i][j] = EMPTY;
+        }
+    }
     menu();
-    choices();
+    choices(map);
 }
 
 /// Imprime o menu
@@ -39,7 +47,7 @@ void menu()
 }
 
 // Verifica a escolha do utilizador
-void choices()
+void choices(char game[][MAX])
 {
     int i = 1;
     // nome da escolha
@@ -48,8 +56,6 @@ void choices()
     char filename[200];
     // nome do ficheiro para fazer export
     char filenameout[200];
-    // array
-    char game[MAX][MAX];
     // variavel de ajuda para opção show
     int count = 0;
 
@@ -76,22 +82,12 @@ void choices()
 
                     for (int j = 0; j < MAX; j++)
                     {
-                        if (count <= 0)
-                        {
-                            game[i][j] = EMPTY;
-                            printf("%c", game[i][j]);
-                            if (j == (MAX - 1))
-                                printf("\n");
-                        }
-                        else
-                        {
-                            if (game[i][j] == EMPTY)
-                                printf("_");
-                            else if ((game[i][j]) == (ARMED))
-                                printf(".");
-                            else if ((game[i][j]) == (DISARMED))
-                                printf("*");
-                        }
+                        if (game[i][j] == EMPTY)
+                            printf("_");
+                        else if ((game[i][j]) == (ARMED))
+                            printf(".");
+                        else if ((game[i][j]) == (DISARMED))
+                            printf("*");
                     }
                     if (count > 0)
                         printf("\n");
