@@ -262,7 +262,7 @@ void writeFile(char filenameout[200], char grid[][MAX]){
     file = fopen(filenameout, "w");
     // Verifica se o ficheiro é null
     if(file == NULL){
-        fputs("Error opening the file.\n", stdout);
+        fputs("Error opening the file\n", stdout);
     }
     // Abre a grelha 
     // Verifica se há bombas armadas no array
