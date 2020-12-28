@@ -28,12 +28,13 @@ int main()
 void menu()
 {
     puts("+-----------------------------------------------------");
-    puts("read <filename>     - read input file");
-    puts("show                - show the mine map");
-    puts("trigger <x> <y>     - trigger mine at <x> <y>");
-    puts("plant <x> <y>       - place armed mine at <x> <y>");
-    puts("export <filename>   - save file with current map");
+    puts("read <filename> - read input file");
+    puts("show - show the mine map");
+    puts("trigger <x> <y> - trigger mine at <x> <y>");
+    puts("plant <x> <y> - place armed mine at <x> <y>");
+    puts("export <filename> - save file with current map");
     puts("quit                - exit program");
+    puts("sos - show menu");
     puts("+-----------------------------------------------------");
 }
 
@@ -55,14 +56,14 @@ void choices()
 
     do
     {
-        printf("\n>");
+        printf(">");
         // verifica a escolha do menu
-        if (scanf("\n%s", &choice))
+        if (scanf("\n%s", choice))
         {
             // lê a escolha e o path do ficheiro
             if (strcmp(choice, "read") == 0)
             {
-                if (scanf("%s", &filename))
+                if (scanf("%s", filename))
                 {
                     readFile(filename, game);
                     count = 1;
@@ -82,11 +83,11 @@ void choices()
                         }
                         else
                         {
-                            if(game[i][j] == EMPTY || game[i][j] == NULL)
+                            if(game[i][j] == EMPTY)
                                 printf("_");
-                            else if(game[i][j] == ARMED)
+                            else if((game[i][j]) == (ARMED))
                                 printf(".");
-                            else if(game[i][j] == DISARMED)
+                            else if((game[i][j]) == (DISARMED))
                                 printf("*");   
                         }
                     }
@@ -100,7 +101,6 @@ void choices()
                 int posx, posy;
                 int count1 = 0;
                 scanf("%d%d", &posx, &posy);
-                if(posx != NULL || posy != NULL){
                     if((posx >= 0 && posx <= MAX)  && (posy >= 0 && posy < MAX)){
                         
 
@@ -117,20 +117,13 @@ void choices()
                         }
                         if(count1 == 1){
                             fputs("No mine at specified coordinate", stdout);
-                            count1 == 0;
+                            count1 = 0;
                         }
                     }
                     else
                     {
                         fputs("Invalid coordinate",stdout);
                     }   
-                }
-                
-                else
-                {
-                    fputs("Invalid coordinate",stdout);
-                    printf("%d%d", posx, posy);
-                }
 
             }
             // recebe coordenadas x e y e põe uma mina em estado "armed"
@@ -138,30 +131,24 @@ void choices()
             {
                 int posx, posy;
                 scanf("%d%d", &posx, &posy);
-                if(posx != NULL || posy != NULL || (posy == 0 && posx == 0)){
-                    if((posx >= 0 && posx < MAX)  && (posy >= 0 && posy < MAX)){
-                        count++;
-                        for(int i = 0; i < MAX; i++)
+
+                if((posx >= 0 && posx < MAX)  && (posy >= 0 && posy < MAX)){
+                    count++;
+                    for(int i = 0; i < MAX; i++)
+                    {
+                        for (int j = 0; j < MAX; j++)
                         {
-                            for (int j = 0; j < MAX; j++)
-                            {
-                                if((game[i][j] == DISARMED) && (game[i][j] == game[posx][posy])){ 
-                                    game[posx][posy] = ARMED;
-                                }
-                                if((game[i][j] == ARMED) && (game[i][j] == game[posx][posy])){ 
-                                    game[posx][posy] = ARMED;
-                                }
-                                if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
+                            if((game[i][j] == DISARMED) && (game[i][j] == game[posx][posy])){ 
                                 game[posx][posy] = ARMED;
-                                }
+                            }
+                            if((game[i][j] == ARMED) && (game[i][j] == game[posx][posy])){ 
+                                game[posx][posy] = ARMED;
+                            }
+                            if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
+                            game[posx][posy] = ARMED;
                             }
                         }
                     }
-                    else
-                    {
-                        fputs("Invalid coordinate",stdout);
-                    }
-                    
                 }
                 else
                 {
@@ -172,7 +159,7 @@ void choices()
             // Exporta as posições das bombas para outro ficheiro
             else if (strcmp(choice, "export") == 0)
             {
-                if(scanf("%s", &filenameout)){
+                if(scanf("%s", filenameout)){
                     writeFile(filenameout, game);
                 }
             }
@@ -204,6 +191,8 @@ void readFile(char filename[200], char grid[][MAX])
     int chy;
     // Variaveis que vão receber as posições do array
 	int i, j;
+    //int k[200];
+
 
     //Apontador para o ficheiro
     FILE *file;
@@ -232,23 +221,40 @@ void readFile(char filename[200], char grid[][MAX])
         // recebe as posições das minas e imprime-as
         while (fscanf(file, "%d %d", &chx, &chy) != EOF)
         {
-            if(chx != NULL || chy != NULL){
-                grid[chx][chy] = ARMED;
+            if(chx == EOF){
+                printf("%d %d\n", chx, chy);
+                break; //retun?
 
+            }
+            else if(chy == EOF)
+            {
+                fputs("File is corrupted\n", stdout);
+                break;//return?
+            }
+        }
+            /*if((chx != 0) || (chy != 0))
+            {
+
+                if((chx == EOF) || (chy == EOF))
+                {
+                    fputs("File is corrupted\n", stdout);
+                    grid[chx][chy] = EMPTY;
+                }
+                else
+                {
+                    grid[chx][chy] = ARMED;
+                }
             }
             // Caso exista uma posição x ou y null retorna o erro
             else
             {
                 fputs("File is corrupted\n", stdout);
-            }
+            }*/
             
         }
-        // Fecha o ficheiro
         fclose(file);
+        // Fecha o ficheiro
     }
-
-	
-}
 
 // cria um ficheiro novo
 void writeFile(char filenameout[200], char grid[][MAX]){
