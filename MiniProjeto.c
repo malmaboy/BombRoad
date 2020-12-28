@@ -284,7 +284,7 @@ void readFile(char filename[200], char grid[][MAX])
 
                 else if (turn == 1)
                 {
-                    if ((ch == '\n') && (hasy) || (ch == ' '))
+                    if (((ch == '\n') && (hasy)) || (ch == ' '))
                     {
                         grid[chx][chy] = ARMED;
 
