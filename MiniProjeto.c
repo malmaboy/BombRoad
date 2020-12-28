@@ -37,7 +37,7 @@ void menu()
     puts("+-----------------------------------------------------");
 }
 
-// Verifica a escolha do utlizador
+// Verifica a escolha do utilizador
 void choices()
 {
     int i = 1;
@@ -56,18 +56,19 @@ void choices()
     do
     {
         printf("\n>");
-        // lê a escolha e o path do ficheiro
+        // verifica a escolha do menu
         if (scanf("\n%s", &choice))
         {
-            // compares the input with the menu options
+            // lê a escolha e o path do ficheiro
             if (strcmp(choice, "read") == 0)
             {
                 if (scanf("%s", &filename))
                 {
                     readFile(filename, game);
-                    count++;
+                    count = 1;
                 }
             }
+            // Imprime o mapa
             else if (strcmp(choice, "show") == 0)
             {
                 for (int i = 0; i < MAX; i++){
@@ -75,17 +76,23 @@ void choices()
                     for (int j = 0; j < MAX; j++){
                         if(count <= 0){
                             game[i][j] = EMPTY;
-                            
+                            printf("%c", game[i][j]);
+                            if (j == (MAX-1))
+                                printf("\n");
                         }
                         else
                         {
-                            game[i][j];
-
+                            if(game[i][j] == EMPTY || game[i][j] == NULL)
+                                printf("_");
+                            else if(game[i][j] == ARMED)
+                                printf(".");
+                            else if(game[i][j] == DISARMED)
+                                printf("*");   
                         }
-                        
-                    printf("%c", game[i][j]);
+                    }
+                    if(count > 0)
+                        printf("\n");
                 }
-        }
             }
             // Recebe coordenas x e y e põe as minas em estado "off"
             else if (strcmp(choice, "trigger") == 0)
@@ -106,33 +113,24 @@ void choices()
                                 else if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
                                     count1 = 1;
                                 }
-                                
-
-
-
-
                             }
                         }
                         if(count1 == 1){
-                            fputs("No mine at specified coordinate", stderr);
+                            fputs("No mine at specified coordinate", stdout);
                             count1 == 0;
                         }
                     }
                     else
                     {
-                        fputs("Invalid coordinate.",stderr);
-                    }
-                    
+                        fputs("Invalid coordinate",stdout);
+                    }   
                 }
                 
                 else
                 {
-                    fputs("Invalid coordinate.",stderr);
+                    fputs("Invalid coordinate",stdout);
                     printf("%d%d", posx, posy);
                 }
-                
-                
-
 
             }
             // recebe coordenadas x e y e põe uma mina em estado "armed"
@@ -140,9 +138,9 @@ void choices()
             {
                 int posx, posy;
                 scanf("%d%d", &posx, &posy);
-                if(posx != NULL || posy != NULL){
-                    if((posx >= 0 && posx <= MAX)  && (posy >= 0 && posy < MAX)){
-
+                if(posx != NULL || posy != NULL || (posy == 0 && posx == 0)){
+                    if((posx >= 0 && posx < MAX)  && (posy >= 0 && posy < MAX)){
+                        count++;
                         for(int i = 0; i < MAX; i++)
                         {
                             for (int j = 0; j < MAX; j++)
@@ -154,31 +152,29 @@ void choices()
                                     game[posx][posy] = ARMED;
                                 }
                                 if((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy])){
-                                game[posx][posy] = EMPTY;
+                                game[posx][posy] = ARMED;
                                 }
                             }
                         }
                     }
                     else
                     {
-                        fputs("Invalid coordinate.",stderr);
+                        fputs("Invalid coordinate",stdout);
                     }
                     
                 }
                 else
                 {
-                    fputs("Invalid coordinate.",stderr);
+                    fputs("Invalid coordinate",stdout);
                 }
-                
-
             }
+
             // Exporta as posições das bombas para outro ficheiro
             else if (strcmp(choice, "export") == 0)
             {
                 if(scanf("%s", &filenameout)){
                     writeFile(filenameout, game);
                 }
-
             }
             // Fecha a aplicação
             else if (strcmp(choice, "quit") == 0)
@@ -192,7 +188,7 @@ void choices()
             }
             else
             {
-                fputs("Invalid input.", stderr);
+                fputs("Invalid input", stdout);
             }
         }
 
@@ -219,7 +215,7 @@ void readFile(char filename[200], char grid[][MAX])
     // Verifica se o ficheiro é valido
     if (file == NULL)
     {
-        fputs("Error opening file\n", stderr);
+        fputs("Error opening file\n", stdout);
     }
     else
     {
@@ -243,7 +239,7 @@ void readFile(char filename[200], char grid[][MAX])
             // Caso exista uma posição x ou y null retorna o erro
             else
             {
-                fputs("File is corrupted.\n", stderr);
+                fputs("File is corrupted\n", stdout);
             }
             
         }
@@ -266,7 +262,7 @@ void writeFile(char filenameout[200], char grid[][MAX]){
     file = fopen(filenameout, "w");
     // Verifica se o ficheiro é null
     if(file == NULL){
-        fputs("Error opening the file.\n", stderr);
+        fputs("Error opening the file.\n", stdout);
     }
     // Abre a grelha 
     // Verifica se há bombas armadas no array
