@@ -217,7 +217,7 @@ void readFile(char filename[200], char grid[][MAX])
 
 
     // Verifica se o ficheiro é valido
-    if (filename == NULL)
+    if (file == NULL)
     {
         fputs("Error opening file\n", stderr);
     }
@@ -259,8 +259,6 @@ void writeFile(char filenameout[200], char grid[][MAX]){
 
     // Apontador para o ficheiro
     FILE *file;
-    // int para ler o caracteres
-    int chx, chy;
     // variaveis da grelha
     int i,j;
 
