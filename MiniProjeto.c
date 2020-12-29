@@ -213,6 +213,7 @@ void readFile(char filename[200], char grid[][MAX])
     if (file == NULL)
     {
         fputs("Error opening file\n", stdout);
+        choices(grid);
     }
     else
     {
