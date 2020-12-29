@@ -118,13 +118,13 @@ void choices(char game[][MAX])
                     }
                     if (count1 == 1)
                     {
-                        fputs("No mine at specified coordinate", stdout);
+                        fputs("No mine at specified coordinate\n", stdout);
                         count1 = 0;
                     }
                 }
                 else
                 {
-                    fputs("Invalid coordinate", stdout);
+                    fputs("Invalid coordinate\n", stdout);
                 }
             }
             // recebe coordenadas x e y e põe uma mina em estado "armed"
@@ -157,7 +157,7 @@ void choices(char game[][MAX])
                 }
                 else
                 {
-                    fputs("Invalid coordinate", stdout);
+                    fputs("Invalid coordinate\n", stdout);
                 }
             }
 
@@ -181,7 +181,7 @@ void choices(char game[][MAX])
             }
             else
             {
-                fputs("Invalid input", stdout);
+                fputs("Invalid input\n", stdout);
             }
         }
 
@@ -194,14 +194,15 @@ void readFile(char filename[200], char grid[][MAX])
     char ch;
     // Variavel que recebe a posição x
     int chx;
+    int hasx;
     // Variavel que recebe a posição y
     int chy;
-    int hasx;
     int hasy;
     // Variaveis que vão receber as posições do array
+    int offIndex;
     int turn;
     int i, j;
-    //int k[200];
+    int corrupted = 0;
 
     //Apontador para o ficheiro
     FILE *file;
@@ -232,23 +233,54 @@ void readFile(char filename[200], char grid[][MAX])
         chy = 0;
         hasx = 0;
         hasy = 0;
+        offIndex = 0;
 
         // recebe as posições das minas e imprime-as
         while (1)
         {
             if (fscanf(file, "%c", &ch) != EOF)
             {
-
-                if (turn == 0)
+                if (offIndex)
                 {
                     if (ch == '\n')
                     {
-                        if (hasx)
+                        turn = 0;
+                        chx = 0;
+                        chy = 0;
+                        offIndex = 0;
+                    }
+                    else if (ch == ' ')
+                    {
+                        if (turn == 0)
+                        {
+                            turn = 1;
+                        }
+                        else if (turn == 1)
+                        {
+                            turn = 0;
+                            chx = 0;
+                            chy = 0;
+                            offIndex = 0;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                else if (turn == 0)
+                {
+                    if (ch == '\n')
+                    {
+                        if (hasx && !corrupted)
                         {
                             fputs("File is corrupted\n", stdout);
+                            corrupted = 1;
                         }
                         turn = 0;
                         chx = 0;
+
                         chy = 0;
                         hasx = 0;
                         hasy = 0;
@@ -275,6 +307,18 @@ void readFile(char filename[200], char grid[][MAX])
                             chx *= 10;
                             chx += ch - 48;
                             hasx = 1;
+
+                            if (chx >= 25)
+                            {
+                                offIndex = 1;
+                                hasx = 0;
+                                hasy = 0;
+                                if (!corrupted)
+                                {
+                                    fputs("File is corrupted\n", stdout);
+                                    corrupted=1;
+                                }
+                            }
                         }
                     }
                 }
@@ -293,7 +337,11 @@ void readFile(char filename[200], char grid[][MAX])
                     }
                     else if (ch == '\n')
                     {
-                        fputs("File is corrupted\n", stdout);
+                        if (!corrupted)
+                        {
+                            fputs("File is corrupted\n", stdout);
+                            corrupted=1;
+                        }
 
                         turn = 0;
                         chx = 0;
@@ -308,31 +356,53 @@ void readFile(char filename[200], char grid[][MAX])
                             chy = ch - 48;
                             hasy = 1;
                         }
+
                         else
                         {
                             chy *= 10;
                             chy += ch - 48;
                             hasy = 1;
+
+                            if (chy >= 25)
+                            {
+                                offIndex = 1;
+                                hasx = 0;
+                                hasy = 0;
+
+                                if (!corrupted)
+                                {
+                                    fputs("File is corrupted\n", stdout);
+                                    corrupted=1;
+                                }
+                            }
                         }
                     }
                 }
             }
             else
             {
-                if (turn == 0)
+                if ((turn == 0) && !offIndex)
                 {
-                    if (hasx)
+                    if (hasx && !corrupted)
                     {
                         fputs("File is corrupted\n", stdout);
+                        corrupted=1;
                     }
                 }
-                else if ((turn == 1) && (hasy))
+                else if ((turn == 1) && !offIndex)
                 {
-                    grid[chx][chy] = ARMED;
-                }
-                else
-                {
-                    fputs("File is corrupted\n", stdout);
+                    if (hasy)
+                    {
+                        grid[chx][chy] = ARMED;
+                    }
+                    else
+                    {
+                        if (!corrupted)
+                        {
+                            fputs("File is corrupted\n", stdout);
+                            corrupted=1;
+                        }
+                    }
                 }
                 break;
             }
@@ -359,6 +429,7 @@ void writeFile(char filenameout[200], char grid[][MAX])
         fputs("Error opening the file\n", stdout);
     }
     // Abre a grelha
+    
     // Verifica se há bombas armadas no array
     // E verifica se há bombas desarmadas no array
     else
