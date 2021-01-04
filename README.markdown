@@ -9,8 +9,9 @@
 - Numa fase inicial do projeto planeamos dividir o projeto por funções para melhor organização e reutilização do código;
 - A função `main` vai chamar 2 funções uma delas para imprimir o menu sempre que o programa é inicializado e outra que trata do resto do programa. Sempre que o programa é inicializado isto garante que o menu é imprimido no inicio;
 - A função `menu` possui como conteúdo uma série de comandos `puts` de modo a imprimir o menu conforme o enunciado. Deste modo basta chamar a função para imprimir o menu.
-- A função `choices` é responsável pelo input do jogador e o manuseamento do mapa. A função possui um loop infinito de modo que o jogo apenas acabe quando o jogador comandar. Um mapa vazio é gerado automaticamente no inicio do programa e caso outro mapa seja importado este é apagado. Esta função chama as funções `readFile` e `writeFile` caso sejam selecionadas as opções para ler ou gravar ficheiros.
-
+- A função `choices` é responsável pelo input do jogador e o manuseamento do mapa. A função possui um loop infinito de modo que o jogo apenas acabe quando o jogador assim o comandar. Um mapa vazio é gerado automaticamente no inicio do programa e caso outro mapa seja importado este é apagado. Esta função chama as funções `readFile` e `writeFile` caso sejam selecionadas as opções para ler ou gravar ficheiros.
+- A função `readFile` vai ler um ficheiro caracter por caracter, verificar se as coordenadas são válidas e guardar estas num mapa vazio. Todas as coordenadas após as coordenadas inválidas são ingnoradas.
+- A função `writeFile` verifica no mapa onde estão bombas armadas ou triggered e guarda as suas coordenadas num ficheiro vazio.
 
 -   Uma função imprime o menu e não retorna nenhuma valor de modo a que esta possa ser reutilizada. tinha os "prints" do menu. Noutra função lia os "inputs" do utilizador e por ai adiante mas decidimo verificava se os inputs estavam certos. Se estivessem o programa continua, passando para a função seguinte. Caso contrário mostra uma mensagem de erro.
 
