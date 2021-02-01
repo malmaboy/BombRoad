@@ -16,6 +16,7 @@ void choices();
 void readFile(char filename[200], char grid[][MAX]);
 void show(char empty[][MAX], char armed[][MAX]);
 void writeFile(char filenameout[200], char grid[][MAX]);
+void log(char game[][MAX]);
 
 // Main
 int main()
@@ -39,6 +40,7 @@ void menu()
     puts("read <filename> - read input file");
     puts("show - show the mine map");
     puts("trigger <x> <y> - trigger mine at <x> <y>");
+    puts("log <x> <y> - trigger mine at <x> <y>");
     puts("plant <x> <y> - place armed mine at <x> <y>");
     puts("export <filename> - save file with current map");
     puts("quit                - exit program");
@@ -179,6 +181,34 @@ void choices(char game[][MAX])
             {
                 menu();
             }
+            else if(strcmp(choice, "log") == 0)
+            {
+                int posx, posy;
+                scanf("%d%d", &posx, &posy);
+
+                for(int i = 0; i < MAX; i++){
+                    for(int j = 0; j < MAX; j++)
+                    {
+                        if ((game[i][j] == ARMED) && (game[i][j] == game[posx][posy]))
+                            {
+                                // Verifica se existem números negativos
+                                if(game[posx] <= 0){
+                                    game[posx] == 0;
+                                }
+                                else if(game[posy] <= 0)
+                                {
+                                    game[posy] == 0;
+                                }
+                                game[posx][posy] = DISARMED;
+                                if(game[posx][posy] = DISARMED)
+                                {
+                                    log(game[posx, posy]);
+                                }
+                                
+                            }
+                    }
+                }
+            }
             else
             {
                 fputs("Invalid input\n", stdout);
@@ -186,6 +216,57 @@ void choices(char game[][MAX])
         }
 
     } while (i != 0);
+}
+
+
+void log(char game[][MAX])
+{
+    int time = 0;
+
+    for (int i = 0; i < MAX; i++){
+        for (int j = 0; j < MAX; j++){
+            
+            
+                if(game[i + 1][j + 1] == ARMED){
+                    game[i + 1][j + 1] = DISARMED;
+                    printf("%d", game[i+ 1][j]);
+                    return;
+                }
+                if(game[i + 1][j] == ARMED)
+                {
+                    game[i + 1][j] = DISARMED;
+                    printf("%d", game[i+ 1][j]);
+                    return;
+                }
+                
+                if(game[i][j + 1] == ARMED){
+                    game[i][j+ 1] = DISARMED;
+                    return;                    
+                }
+                if (game[i - 1][j] == ARMED){
+                    game[i- 1][j] = DISARMED; 
+                    return;
+                }
+                if (game[i][j - 1] == ARMED){
+                    game[i][j - 1] = DISARMED;
+                    return;
+                }
+                /// Loop para rebetar as 15 após as 10
+                if(game[i + 1][j + 1] == ARMED){
+                    game[i + 1][j + 1] = DISARMED;
+                    return;
+
+                }
+                else if(game[i - 1][j - 1] == ARMED){
+                    game[i - 1][j - 1] = DISARMED;
+                    return;
+                }
+              
+            
+            
+            
+        }
+    }             
 }
 
 // Lê o ficheiro
