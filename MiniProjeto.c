@@ -190,22 +190,18 @@ void choices(char game[][MAX])
                     for(int j = 0; j < MAX; j++)
                     {
                         if ((game[i][j] == ARMED) && (game[i][j] == game[posx][posy]))
-                            {
-                                // Verifica se existem números negativos
-                                if(game[posx] <= 0){
-                                    game[posx] == 0;
-                                }
-                                else if(game[posy] <= 0)
-                                {
-                                    game[posy] == 0;
-                                }
-                                game[posx][posy] = DISARMED;
-                                if(game[posx][posy] = DISARMED)
-                                {
-                                    log(game[posx, posy]);
-                                }
-                                
+                        {
+                            // Verifica se existem números negativos
+                            if(game[posx] <= 0){
+                                game[posx] == 0;
                             }
+                            else if(game[posy] <= 0)
+                            {
+                                game[posy] == 0;
+                            }
+                            game[posx][posy] = DISARMED;
+                            log(game);
+                        }
                     }
                 }
             }
@@ -226,37 +222,48 @@ void log(char game[][MAX])
     for (int i = 0; i < MAX; i++){
         for (int j = 0; j < MAX; j++){
             
-            
-                if(game[i + 1][j + 1] == ARMED){
-                    game[i + 1][j + 1] = DISARMED;
-                    printf("%d", game[i+ 1][j]);
-                    return;
-                }
-                if(game[i + 1][j] == ARMED)
+
+                // Direita
+                if(game[i + 1][j] == ARMED) 
                 {
                     game[i + 1][j] = DISARMED;
                     printf("%d", game[i+ 1][j]);
                     return;
                 }
-                
+                // Baixo
                 if(game[i][j + 1] == ARMED){
                     game[i][j+ 1] = DISARMED;
                     return;                    
                 }
+                // Esquerda
                 if (game[i - 1][j] == ARMED){
                     game[i- 1][j] = DISARMED; 
                     return;
                 }
+                // Cima
                 if (game[i][j - 1] == ARMED){
                     game[i][j - 1] = DISARMED;
                     return;
                 }
-                /// Loop para rebetar as 15 após as 10
+                // Diagonal Direita Cima
                 if(game[i + 1][j + 1] == ARMED){
                     game[i + 1][j + 1] = DISARMED;
                     return;
 
                 }
+                // Diagonal Direita Baixo
+                if(game[i + 1][j - 1] == ARMED){
+                    game[i + 1][j - 1] = DISARMED;
+                    return;
+
+                }
+                // Diagonal Esquerda Cima
+                if(game[i - 1][j + 1] == ARMED){
+                    game[i - 1][j + 1] = DISARMED;
+                    return;
+
+                }
+                // Diagonal Esquerda Baixo
                 else if(game[i - 1][j - 1] == ARMED){
                     game[i - 1][j - 1] = DISARMED;
                     return;
