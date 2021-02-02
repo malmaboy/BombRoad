@@ -350,6 +350,8 @@ void log(char game[][MAX], int x, int y, int time, int logPos[100], int logCount
                     // Guarda a posição das adjacentes, y
                     logPos[logCount * 2 + 1] = y + j;
                     logCount++;
+                    time += 10;
+                    printf("%d [%d, %d]\n", time, x + i, y + j);
                 }
             }
         }
