@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 // tamanho do array
 #define MAX 25
@@ -14,9 +15,8 @@
 void menu();
 void choices();
 void readFile(char filename[200], char grid[][MAX]);
-void show(char empty[][MAX], char armed[][MAX]);
 void writeFile(char filenameout[200], char grid[][MAX]);
-void log(char game[][MAX], int x, int y, int time, int logPos[100], int logCount);
+void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount);
 void trigger(char game[][MAX], int x, int y, int logPos[100], int logCount);
 
 // Main
@@ -123,8 +123,24 @@ void choices(char game[][MAX])
                         if (game[posx][posy] == ARMED)
                         {
                             game[posx][posy] = DISARMED;
-                            trigger(game, posx, posy,logPos, logCount);
+                            trigger(game, posx, posy, logPos, logCount);
+                            for (int i = 0; i < MAX; i++)
+                            {
 
+                                for (int j = 0; j < MAX; j++)
+                                {
+                                    if (game[i][j] == EMPTY)
+                                        printf("_");
+                                    else if ((game[i][j]) == (ARMED))
+                                        printf(".");
+                                    else if ((game[i][j]) == (DISARMED))
+                                        printf("*");                                    
+                                }
+
+                                if(count > 0){
+                                    printf("\n");
+                                }
+                            }
                         }
                     }
                     if (count1 == 1)
@@ -210,8 +226,7 @@ void choices(char game[][MAX])
                     {
                         game[posx][posy] = DISARMED;
                         printf("%d [%d, %d]\n", time, posx, posy);
-                        log(game, posx, posy, time, logPos, logCount);
-
+                        logFunc(game, posx, posy, time, logPos, logCount);
                     }
                 }
             }
@@ -224,7 +239,7 @@ void choices(char game[][MAX])
     } while (i != 0);
 }
 
-void trigger(char game[][MAX], int x, int y, int logPos[100], int logCount)
+void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
 {
     if (logCount > 0)
     {
@@ -309,7 +324,7 @@ void trigger(char game[][MAX], int x, int y, int logPos[100], int logCount)
     }
 }
 
-void log(char game[][MAX], int x, int y, int time, int logPos[100], int logCount)
+void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount)
 {
     if (logCount > 0)
     {
@@ -394,7 +409,7 @@ void log(char game[][MAX], int x, int y, int time, int logPos[100], int logCount
     }
     if (logCount)
     {
-        log(game, logPos[0], logPos[1], time, logPos, logCount);
+        logFunc(game, logPos[0], logPos[1], time, logPos, logCount);
     }
 }
 
