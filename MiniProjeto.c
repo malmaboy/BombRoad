@@ -123,6 +123,23 @@ void choices(char game[][MAX])
                         {
                             game[posx][posy] = DISARMED;
                             trigger(game, posx, posy, logPos, logCount);
+                            for (int i = 0; i < MAX; i++)
+                            {
+
+                                for (int j = 0; j < MAX; j++)
+                                {
+                                    if (game[i][j] == EMPTY)
+                                        printf("_");
+                                    else if ((game[i][j]) == (ARMED))
+                                        printf(".");
+                                    else if ((game[i][j]) == (DISARMED))
+                                        printf("*");                                    
+                                }
+
+                                if(count > 0){
+                                    printf("\n");
+                                }
+                            }
                         }
                         else
                         {
