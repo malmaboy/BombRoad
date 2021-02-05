@@ -4,7 +4,7 @@
 #include <math.h>
 
 // tamanho do array
-#define MAX 25
+#define DEFAULT 25
 // sem mina
 #define EMPTY '_'
 // mina armada
@@ -14,24 +14,17 @@
 
 void menu();
 void choices();
-void readFile(char filename[200], char grid[][MAX]);
-void writeFile(char filenameout[200], char grid[][MAX]);
-void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount);
-void trigger(char game[][MAX], int x, int y, int logPos[100], int logCount);
+void readFile(char filename[200], char** grid, int* row, int* col);
+void writeFile(char filenameout[200], char** grid, int row, int col);
+void logFunc(char** game, int x, int y, int time, int logPos[625], int logCount, int row, int col);
+void trigger(char** game, int x, int y, int logPos[100], int logCount, int row, int col);
+char** generateMap(int row, int col);
 
 // Main
 int main()
 {
-    char map[MAX][MAX];
-    for (int i = 0; i < MAX; i++)
-    {
-        for (int j = 0; j < MAX; j++)
-        {
-            map[i][j] = EMPTY;
-        }
-    }
     menu();
-    choices(map);
+    choices();
 }
 
 /// Imprime o menu
@@ -50,7 +43,7 @@ void menu()
 }
 
 // Verifica a escolha do utilizador
-void choices(char game[][MAX])
+void choices()
 {
     int i = 1;
     // nome da escolha
@@ -66,6 +59,11 @@ void choices(char game[][MAX])
     int count = 0;
     // Tempo de Explosão
     int time = 0;
+    // Tamanho Maximo
+    int row = DEFAULT;
+	int col = DEFAULT;
+	// Gerar Mapa
+	char** game = generateMap(row, col);
 
     do
     {
@@ -78,17 +76,16 @@ void choices(char game[][MAX])
             {
                 if (scanf("%s", filename))
                 {
-                    readFile(filename, game);
+                    readFile(filename, game, row, col);
                     count = 1;
                 }
             }
             // Imprime o mapa
             else if (strcmp(choice, "show") == 0)
             {
-                for (int i = 0; i < MAX; i++)
+                for (int i = 0; i < row; i++)
                 {
-
-                    for (int j = 0; j < MAX; j++)
+                    for (int j = 0; j < col; j++)
                     {
                         if (game[i][j] == EMPTY)
                             printf("_");
@@ -97,8 +94,8 @@ void choices(char game[][MAX])
                         else if ((game[i][j]) == (DISARMED))
                             printf("*");
                     }
-                    if (count > 0)
-                        printf("\n");
+                    //if (count > 0)
+                    printf("\n");
                 }
             }
             // Recebe coordenas x e y e põe as minas em estado "off"
@@ -106,14 +103,14 @@ void choices(char game[][MAX])
             {
                 int posx, posy;
                 scanf("%d%d", &posx, &posy);
-                if ((posx >= 0 && posx <= MAX) && (posy >= 0 && posy < MAX))
+                if ((posx >= 0 && posx <= row) && (posy >= 0 && posy < row))
                 {
                     // Verifica se existem números negativos
-                    if (posx < 0 || posx >= MAX)
+                    if (posx < 0 || posx >= col)
                     {
                         fputs("Invalid input\n", stdout);
                     }
-                    else if (posy < 0 || posy >= MAX)
+                    else if (posy < 0 || posy >= col)
                     {
                         fputs("Invalid input\n", stdout);
                     }
@@ -122,11 +119,10 @@ void choices(char game[][MAX])
                         if (game[posx][posy] == ARMED)
                         {
                             game[posx][posy] = DISARMED;
-                            trigger(game, posx, posy, logPos, logCount);
-                            for (int i = 0; i < MAX; i++)
+                            trigger(game, posx, posy, logPos, logCount, row, col);
+                            for (int i = 0; i < row; i++)
                             {
-
-                                for (int j = 0; j < MAX; j++)
+                                for (int j = 0; j < col; j++)
                                 {
                                     if (game[i][j] == EMPTY)
                                         printf("_");
@@ -159,12 +155,12 @@ void choices(char game[][MAX])
                 int posx, posy;
                 scanf("%d%d", &posx, &posy);
 
-                if ((posx >= 0 && posx < MAX) && (posy >= 0 && posy < MAX))
+                if ((posx >= 0 && posx < row) && (posy >= 0 && posy < row))
                 {
                     count++;
-                    for (int i = 0; i < MAX; i++)
+                    for (int i = 0; i < col; i++)
                     {
-                        for (int j = 0; j < MAX; j++)
+                        for (int j = 0; j < col; j++)
                         {
                             if ((game[i][j] == DISARMED) && (game[i][j] == game[posx][posy]))
                             {
@@ -192,7 +188,7 @@ void choices(char game[][MAX])
             {
                 if (scanf("%s", filenameout))
                 {
-                    writeFile(filenameout, game);
+                    writeFile(filenameout, game, row, col);
                 }
             }
             // Fecha a aplicação
@@ -211,11 +207,11 @@ void choices(char game[][MAX])
                 scanf("%d%d", &posx, &posy);
 
                 // Verifica se existem números negativos
-                if (posx < 0 || posx >= MAX)
+                if (posx < 0 || posx >= row)
                 {
                     fputs("Invalid input\n", stdout);
                 }
-                else if (posy < 0 || posy >= MAX)
+                else if (posy < 0 || posy >= row)
                 {
                     fputs("Invalid input\n", stdout);
                 }
@@ -225,7 +221,7 @@ void choices(char game[][MAX])
                     {
                         game[posx][posy] = DISARMED;
                         printf("%d [%d, %d]\n", time, posx, posy);
-                        logFunc(game, posx, posy, time, logPos, logCount);
+                        logFunc(game, posx, posy, time, logPos, logCount, row, col);
                     }
                 }
             }
@@ -238,7 +234,7 @@ void choices(char game[][MAX])
     } while (i != 0);
 }
 
-void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
+void trigger(char** game, int x, int y, int logPos[625], int logCount, int row, int col)
 {
     if (logCount > 0)
     {
@@ -262,7 +258,7 @@ void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
                 continue;
             }
             // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
+            else if ((x + i < 0) || (x + i > row) || (y + j < 0) || (y + j > col))
             {
                 // Vai para o else
                 continue;
@@ -297,7 +293,7 @@ void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
                 continue;
             }
             // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
+            else if ((x + i < 0) || (x + i > row) || (y + j < 0) || (y + j > col))
             {
                 // Vai para o else
                 continue;
@@ -319,11 +315,11 @@ void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
     }
     if (logCount)
     {
-        trigger(game, logPos[0], logPos[1], logPos, logCount);
+        trigger(game, logPos[0], logPos[1], logPos, logCount, row, col);
     }
 }
 
-void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount)
+void logFunc(char** game, int x, int y, int time, int logPos[625], int logCount, int row, int col)
 {
     if (logCount > 0)
     {
@@ -347,7 +343,7 @@ void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logC
                 continue;
             }
             // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
+            else if ((x + i < 0) || (x + i > row) || (y + j < 0) || (y + j > col))
             {
                 // Vai para o else
                 continue;
@@ -384,7 +380,7 @@ void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logC
                 continue;
             }
             // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
+            else if ((x + i < 0) || (x + i > row) || (y + j < 0) || (y + j > col))
             {
                 // Vai para o else
                 continue;
@@ -408,12 +404,12 @@ void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logC
     }
     if (logCount)
     {
-        logFunc(game, logPos[0], logPos[1], time, logPos, logCount);
+        logFunc(game, logPos[0], logPos[1], time, logPos, logCount, row, col);
     }
 }
 
 // Lê o ficheiro
-void readFile(char filename[200], char grid[][MAX])
+void readFile(char filename[200], char** grid, int* row, int* col)
 {
     char ch;
     // Variavel que recebe a posição x
@@ -425,7 +421,6 @@ void readFile(char filename[200], char grid[][MAX])
     // Variaveis que vão receber as posições do array
     int currentNum;
     int turn;
-    int i, j;
     int corrupted = 0;
 
     //Apontador para o ficheiro
@@ -438,19 +433,13 @@ void readFile(char filename[200], char grid[][MAX])
     if (file == NULL)
     {
         fputs("Error opening file\n", stdout);
-        choices(grid);
     }
     else
     {
-        // Se o ficheiro for valido lê as posições que estão ficheiro
-        // e aplica no array
-        for (i = 0; i < MAX; i++)
-        {
-            for (j = 0; j < MAX; j++)
-            {
-                grid[i][j] = EMPTY;
-            }
-        }
+        *row = 3;
+        *col = 3;
+        free(grid);
+        grid = generateMap(*row, *col); //ir buscar valores a ficheiro!!
 
         turn = 0;
         chx = 0;
@@ -643,7 +632,7 @@ void readFile(char filename[200], char grid[][MAX])
 }
 
 // cria um ficheiro novo
-void writeFile(char filenameout[200], char grid[][MAX])
+void writeFile(char filenameout[200], char** grid, int row, int col)
 {
 
     // Apontador para o ficheiro
@@ -657,7 +646,6 @@ void writeFile(char filenameout[200], char grid[][MAX])
     if (file == NULL)
     {
         fputs("Error opening the file\n", stdout);
-        choices(grid);
     }
     // Abre a grelha
 
@@ -665,9 +653,9 @@ void writeFile(char filenameout[200], char grid[][MAX])
     // E verifica se há bombas desarmadas no array
     else
     {
-        for (i = 0; i < MAX; i++)
+        for (i = 0; i < row; i++)
         {
-            for (j = 0; j < MAX; j++)
+            for (j = 0; j < col; j++)
             {
                 // Bombas armadas no array(posições)
                 if (grid[i][j] == ARMED)
@@ -686,4 +674,37 @@ void writeFile(char filenameout[200], char grid[][MAX])
         // Fecha o ficheiro
         fclose(file);
     }
+}
+
+// Gerar Mapa
+char** generateMap(int row, int col)
+{
+	// aloca um vector de vectores com tamanho nrows
+	char** map = (char**)malloc(row * sizeof(char*));
+
+	if (map == NULL)
+	{
+		puts("Error: Out of Memory");
+		exit(1);
+	}
+	// para cada elemento do vector, aloca um vector com tamanho ncols
+	for (int i = 0; i < row; i++)
+	{
+		map[i] = malloc(col * sizeof(char));
+		if (map[i] == NULL)
+		{
+			puts("Error: Out of Memory");
+			exit(1);
+		}
+	}
+	// a partir daqui pode aceder aos elementos da matriz da forma habitual map[x][y]
+	for (int i = 0; i < row; i++)
+	{
+		for (int j = 0; j < col; j++)
+		{
+			map[i][j] = EMPTY;
+		}
+	}
+
+	return map;
 }
