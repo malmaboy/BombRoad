@@ -18,6 +18,7 @@ void readFile(char filename[200], char grid[][MAX]);
 void writeFile(char filenameout[200], char grid[][MAX]);
 void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount);
 void trigger(char game[][MAX], int x, int y, int logPos[100], int logCount);
+void saveLog(int x, int y, int _logPos[], int _logCount, int time);
 
 // Main
 int main()
@@ -61,7 +62,6 @@ void choices(char game[][MAX])
     char filenameout[200];
     // lista de posições para rebentar
     int logPos[100];
-    int logCount = 0;
     // variavel de ajuda para opção show
     int count = 0;
     // Tempo de Explosão
@@ -122,7 +122,7 @@ void choices(char game[][MAX])
                         if (game[posx][posy] == ARMED)
                         {
                             game[posx][posy] = DISARMED;
-                            trigger(game, posx, posy, logPos, logCount);
+                            //trigger(game, posx, posy, logPos, logCount);
                             for (int i = 0; i < MAX; i++)
                             {
 
@@ -133,10 +133,11 @@ void choices(char game[][MAX])
                                     else if ((game[i][j]) == (ARMED))
                                         printf(".");
                                     else if ((game[i][j]) == (DISARMED))
-                                        printf("*");                                    
+                                        printf("*");
                                 }
 
-                                if(count > 0){
+                                if (count > 0)
+                                {
                                     printf("\n");
                                 }
                             }
@@ -146,7 +147,6 @@ void choices(char game[][MAX])
                             fputs("No mine at specified coordinate\n", stdout);
                         }
                     }
-
                 }
                 else
                 {
@@ -208,25 +208,14 @@ void choices(char game[][MAX])
             else if (strcmp(choice, "log") == 0)
             {
                 int posx, posy;
+
                 scanf("%d%d", &posx, &posy);
 
-                // Verifica se existem números negativos
-                if (posx < 0 || posx >= MAX)
+                if ((posx >= 0) && (posx < MAX) && (posy >= 0) && (posy < MAX) && (game[posx][posy] == ARMED))
                 {
-                    fputs("Invalid input\n", stdout);
-                }
-                else if (posy < 0 || posy >= MAX)
-                {
-                    fputs("Invalid input\n", stdout);
-                }
-                else
-                {
-                    if (game[posx][posy] == ARMED)
-                    {
-                        game[posx][posy] = DISARMED;
-                        printf("%d [%d, %d]\n", time, posx, posy);
-                        logFunc(game, posx, posy, time, logPos, logCount);
-                    }
+                    game[posx][posy] = DISARMED;
+                    printf("%d [%d, %d]\n", time, posx, posy);
+                    logFunc(game, posx, posy, time, logPos, 0);
                 }
             }
             else
@@ -237,7 +226,7 @@ void choices(char game[][MAX])
 
     } while (i != 0);
 }
-
+/*
 void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
 {
     if (logCount > 0)
@@ -246,6 +235,7 @@ void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
         {
             logPos[i] = logPos[i + 2];
         }
+
         logCount--;
     }
 
@@ -321,96 +311,100 @@ void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
     {
         trigger(game, logPos[0], logPos[1], logPos, logCount);
     }
-}
+} */
 
 void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount)
 {
+    // Se houver log vai limpar as posições
     if (logCount > 0)
     {
+        logCount--;
+
         for (int i = 0; i < 98; i++)
         {
             logPos[i] = logPos[i + 2];
         }
-        logCount--;
     }
 
-    // Verifica os lados da bomba
-    for (int i = -1; i < 2; i++)
+    // Verifica a direita
+    if (game[x][y + 1] == ARMED)
     {
-        for (int j = -1; j < 2; j++)
-        {
-
-            // Posição da bomba inicial
-            if ((i == 0 && j == 0) || (i != 0 && j != 0))
-            {
-                // continua
-                continue;
-            }
-            // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
-            {
-                // Vai para o else
-                continue;
-            }
-            // Se está tudo certo rebenta as que estão a volta
-            else
-            {
-
-                if (game[x + i][y + j] == ARMED)
-                {
-                    game[x + i][y + j] = DISARMED;
-                    // Guarda a posição das adjacentes, x
-                    logPos[logCount * 2] = x + i;
-                    // Guarda a posição das adjacentes, y
-                    logPos[logCount * 2 + 1] = y + j;
-                    logCount++;
-                    time += 10;
-                    printf("%d [%d, %d]\n", time, x + i, y + j);
-                }
-            }
-        }
+        game[x][y + 1] = DISARMED;
+        time += 10;
+        saveLog(x, y + 1, logPos, logCount, time);
+        logCount++;
     }
-
-    // Verifica todas as diagonais a volta da bomba
-    for (int i = -1; i < 2; i += 2)
+    // Verifica a esquerda
+    if (game[x][y - 1] == ARMED)
     {
-        for (int j = -1; j < 2; j += 2)
-        {
-
-            // Posição da bomba inicial
-            if (i == 0 && j == 0)
-            {
-                // continua
-                continue;
-            }
-            // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
-            {
-                // Vai para o else
-                continue;
-            }
-            // Se está tudo certo rebenta as que estão a volta
-            else
-            {
-                if (game[x + i][y + j] == ARMED)
-                {
-                    game[x + i][y + j] = DISARMED;
-                    // guarda a posição e das bombas explodidas diagonal , x
-                    logPos[logCount * 2] = x + i;
-                    // guarda a posição e das bombas explodidas diagonal , y
-                    logPos[logCount * 2 + 1] = y + j;
-                    logCount++;
-                    time += 15;
-                    printf("%d [%d, %d]\n", time, x + i, y + j);
-                }
-            }
-        }
+        game[x][y - 1] = DISARMED;
+        time += 10;
+        saveLog(x, y - 1, logPos, logCount, time);
+        logCount++;
     }
-    if (logCount)
+    // Verifica em baixo
+    if (game[x - 1][y] == ARMED)
+    {
+        game[x - 1][y] = DISARMED;
+        time += 10;
+        saveLog(x - 1, y, logPos, logCount, time);
+        logCount++;
+    }
+    // Verifica em cima
+    if (game[x + 1][y] == ARMED)
+    {
+        game[x + 1][y] = DISARMED;
+        time += 10;
+        saveLog(x + 1, y, logPos, logCount, time);
+        logCount++;
+    }
+    // Verifica na diagonal esquerda em cima
+    if (game[x - 1][y - 1] == ARMED)
+    {
+        game[x - 1][y - 1] = DISARMED;
+        time += 15;
+        saveLog(x - 1, y - 1, logPos, logCount, time);
+        logCount++;
+    }
+    // Verifica na diagonal esquerda em baixo
+    if (game[x + 1][y - 1] == ARMED)
+    {
+        game[x + 1][y - 1] = DISARMED;
+        time += 15;
+        saveLog(x + 1, y - 1, logPos, logCount, time);
+        logCount++;
+    }
+    // Verifica na diagonal direita em cima
+    if (game[x + 1][y + 1] == ARMED)
+    {
+        game[x + 1][y + 1] = DISARMED;
+        time += 15;
+        saveLog(x + 1, y + 1, logPos, logCount, time);
+        logCount++;
+    }
+    // Verifica na diagonal direita em baixo
+    if (game[x + 1][y - 1] == ARMED)
+    {
+        game[x + 1][y - 1] = DISARMED;
+        time += 15;
+        saveLog(x + 1, y - 1, logPos, logCount, time);
+        logCount++;
+    }
+
+    if (logCount > 0)
     {
         logFunc(game, logPos[0], logPos[1], time, logPos, logCount);
     }
 }
+
+void saveLog(int x, int y, int _logPos[], int _logCount, int time)
+{
+    _logPos[_logCount * 2] = x;
+    _logPos[_logCount * 2 + 1] = y;
+    printf("%d [%d, %d]\n", time, x, y);
+}
+
+
 
 // Lê o ficheiro
 void readFile(char filename[200], char grid[][MAX])
@@ -428,6 +422,8 @@ void readFile(char filename[200], char grid[][MAX])
     int i, j;
     int corrupted = 0;
 
+    char xdim, ydim;
+
     //Apontador para o ficheiro
     FILE *file;
 
@@ -444,13 +440,6 @@ void readFile(char filename[200], char grid[][MAX])
     {
         // Se o ficheiro for valido lê as posições que estão ficheiro
         // e aplica no array
-        for (i = 0; i < MAX; i++)
-        {
-            for (j = 0; j < MAX; j++)
-            {
-                grid[i][j] = EMPTY;
-            }
-        }
 
         turn = 0;
         chx = 0;
