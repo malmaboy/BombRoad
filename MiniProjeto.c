@@ -418,7 +418,7 @@ void readFile(char filename[200], char** grid, int* row, int* col)
     int corrupted = 0;
 
     char xdim, ydim;
-
+    
     //Apontador para o ficheiro
     FILE *file;
 
@@ -432,8 +432,9 @@ void readFile(char filename[200], char** grid, int* row, int* col)
     }
     else
     {
-        *row = 3;
-        *col = 3;
+        puts("hello");
+        *row = 25;
+        *col = 25;
         free(grid);
         grid = generateMap(*row, *col); //ir buscar valores a ficheiro!!
 
