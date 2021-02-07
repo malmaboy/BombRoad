@@ -13,12 +13,13 @@
 #define DISARMED '*'
 
 void menu();
-void choices();
-void readFile(char filename[200], char grid[][MAX]);
-void writeFile(char filenameout[200], char grid[][MAX]);
+void choices(char game[][MAX]);
+void readFile(char filename[200], char game[][MAX]);
+void writeFile(char filenameout[200], char game[][MAX]);
 void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount);
-void trigger(char game[][MAX], int x, int y, int logPos[100], int logCount);
+void trigger(char game[][MAX], int x, int y, int logPos[100], int logCount, int count, int xdim, int ydim);
 void saveLog(int x, int y, int _logPos[], int _logCount, int time);
+void saveTrigger(int x, int y, int _logPos[], int _logCount);
 
 // Main
 int main()
@@ -66,6 +67,9 @@ void choices(char game[][MAX])
     int count = 0;
     // Tempo de Explosão
     int time = 0;
+    int checkRead = 0;
+
+    int xdim, ydim;
 
     do
     {
@@ -78,79 +82,372 @@ void choices(char game[][MAX])
             {
                 if (scanf("%s", filename))
                 {
-                    readFile(filename, game);
+                    checkRead = 1;
+                    char ch;
+                    // Variavel que recebe a posição x
+                    int chx;
+                    int hasx;
+                    // Variavel que recebe a posição y
+                    int chy;
+                    int hasy;
+                    // Variaveis que vão receber as posições do array
+                    int currentNum;
+                    int turn;
+                    int corrupted = 0;
+
+                    //Apontador para o ficheiro
+                    FILE *file;
+
+                    //Abre o ficheiro
+                    file = fopen(filename, "r");
+
+                    // Verifica se o ficheiro é valido
+                    if (file == NULL)
+                    {
+                        fputs("Error opening file\n", stdout);
+                        choices(game);
+                    }
+                    else
+                    {
+                        // Se o ficheiro for valido lê as posições que estão ficheiro
+                        // e aplica no array
+
+                        turn = 0;
+                        chx = 0;
+                        chy = 0;
+                        hasx = 0;
+                        hasy = 0;
+
+                        fscanf(file, "%d %d", &xdim, &ydim);
+
+                        // recebe as posições das minas
+                        while (1)
+                        {
+                            if (fscanf(file, "%c", &ch) != EOF)
+                            {
+                                currentNum = ch - 48;
+
+                                if ((ch != ' ') && (ch != '\n') && (ch != '\t'))
+                                {
+                                    if ((currentNum < 0) || (currentNum > 9))
+                                    {
+                                        fputs("File is corrupted\n", stdout);
+                                        corrupted = 1;
+                                        break;
+                                    }
+                                }
+
+                                if (turn == 0)
+                                {
+                                    if (ch == '\n')
+                                    {
+                                        if (hasx && !corrupted)
+                                        {
+                                            fputs("File is corrupted\n", stdout);
+                                            corrupted = 1;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                    }
+
+                                    else if ((ch == ' ') || (ch == '\t'))
+                                    {
+                                        if (hasx)
+                                        {
+                                            turn = 1;
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (chx == 0)
+                                        {
+                                            chx = ch - 48;
+                                            hasx = 1;
+                                        }
+
+                                        else
+                                        {
+                                            chx *= 10;
+                                            chx += ch - 48;
+                                            hasx = 1;
+
+                                            if (chx >= 25)
+                                            {
+                                                hasx = 0;
+                                                hasy = 0;
+
+                                                if (!corrupted)
+                                                {
+                                                    fputs("File is corrupted\n", stdout);
+                                                    corrupted = 1;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                else if (turn == 1)
+                                {
+                                    if ((ch == ' ') || (ch == '\t'))
+                                    {
+                                        if (hasy)
+                                        {
+                                            game[chx][chy] = ARMED;
+
+                                            turn = 0;
+                                            chx = 0;
+                                            chy = 0;
+                                            hasx = 0;
+                                            hasy = 0;
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    else if (ch == '\n')
+                                    {
+                                        if (hasy)
+                                        {
+                                            game[chx][chy] = ARMED;
+
+                                            turn = 0;
+                                            chx = 0;
+                                            chy = 0;
+                                            hasx = 0;
+                                            hasy = 0;
+                                        }
+
+                                        else if (!corrupted)
+                                        {
+                                            fputs("File is corrupted\n", stdout);
+                                            corrupted = 1;
+                                            break;
+                                        }
+
+                                        turn = 0;
+                                        chx = 0;
+                                        chy = 0;
+                                        hasx = 0;
+                                        hasy = 0;
+                                    }
+                                    else
+                                    {
+                                        if (chy == 0)
+                                        {
+                                            chy = ch - 48;
+                                            hasy = 1;
+                                        }
+
+                                        else
+                                        {
+                                            chy *= 10;
+                                            chy += ch - 48;
+                                            hasy = 1;
+
+                                            if (chy >= 25)
+                                            {
+                                                hasx = 0;
+                                                hasy = 0;
+
+                                                if (!corrupted)
+                                                {
+                                                    fputs("File is corrupted\n", stdout);
+                                                    corrupted = 1;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (turn == 0)
+                                {
+                                    if (hasx && !corrupted)
+                                    {
+                                        fputs("File is corrupted6\n", stdout);
+                                        corrupted = 1;
+                                        break;
+                                    }
+                                }
+                                else if (turn == 1)
+                                {
+                                    if (hasy)
+                                    {
+                                        game[chx][chy] = ARMED;
+                                    }
+                                    else
+                                    {
+                                        if (!corrupted)
+                                        {
+                                            fputs("File is corrupted7\n", stdout);
+                                            corrupted = 1;
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    // Fecha o ficheiro
+                    fclose(file);
                     count = 1;
                 }
             }
             // Imprime o mapa
             else if (strcmp(choice, "show") == 0)
             {
-                for (int i = 0; i < MAX; i++)
+                if (checkRead == 0)
                 {
 
-                    for (int j = 0; j < MAX; j++)
+                    for (int i = 0; i < MAX; i++)
                     {
-                        if (game[i][j] == EMPTY)
-                            printf("_");
-                        else if ((game[i][j]) == (ARMED))
-                            printf(".");
-                        else if ((game[i][j]) == (DISARMED))
-                            printf("*");
+                        for (int j = 0; j < MAX; j++)
+                        {
+                            if (game[i][j] == EMPTY)
+                                printf("_");
+                            else if ((game[i][j]) == (ARMED))
+                                printf(".");
+                            else if ((game[i][j]) == (DISARMED))
+                                printf("*");
+                        }
+                        if (count > 0)
+                            printf("\n");
                     }
-                    if (count > 0)
-                        printf("\n");
+                }
+                else if (checkRead == 1)
+                {
+                    for (int i = 0; i < xdim; i++)
+                    {
+                        for (int j = 0; j < ydim; j++)
+                        {
+                            if (game[i][j] == EMPTY)
+                                printf("_");
+                            else if ((game[i][j]) == (ARMED))
+                                printf(".");
+                            else if ((game[i][j]) == (DISARMED))
+                                printf("*");
+                        }
+                        if (count > 0)
+                            printf("\n");
+                    }
                 }
             }
             // Recebe coordenas x e y e põe as minas em estado "off"
             else if (strcmp(choice, "trigger") == 0)
             {
                 int posx, posy;
+                int logCount = 0;
                 scanf("%d%d", &posx, &posy);
-                if ((posx >= 0 && posx <= MAX) && (posy >= 0 && posy < MAX))
+                count = 1;
+                if (checkRead == 0)
                 {
-                    // Verifica se existem números negativos
-                    if (posx < 0 || posx >= MAX)
+                    if ((posx >= 0 && posx <= MAX) && (posy >= 0 && posy < MAX))
                     {
-                        fputs("Invalid input\n", stdout);
-                    }
-                    else if (posy < 0 || posy >= MAX)
-                    {
-                        fputs("Invalid input\n", stdout);
-                    }
-                    else
-                    {
-                        if (game[posx][posy] == ARMED)
+                        // Verifica se existem números negativos
+                        if (posx < 0 || posx >= MAX)
                         {
-                            game[posx][posy] = DISARMED;
-                            //trigger(game, posx, posy, logPos, logCount);
-                            for (int i = 0; i < MAX; i++)
-                            {
-
-                                for (int j = 0; j < MAX; j++)
-                                {
-                                    if (game[i][j] == EMPTY)
-                                        printf("_");
-                                    else if ((game[i][j]) == (ARMED))
-                                        printf(".");
-                                    else if ((game[i][j]) == (DISARMED))
-                                        printf("*");
-                                }
-
-                                if (count > 0)
-                                {
-                                    printf("\n");
-                                }
-                            }
+                            fputs("Invalid input\n", stdout);
+                        }
+                        else if (posy < 0 || posy >= MAX)
+                        {
+                            fputs("Invalid input\n", stdout);
                         }
                         else
                         {
-                            fputs("No mine at specified coordinate\n", stdout);
+
+                            if (game[posx][posy] == ARMED)
+                            {
+                                game[posx][posy] = DISARMED;
+                                for (int i = 0; i < MAX; i++)
+                                {
+
+                                    for (int j = 0; j < MAX; j++)
+                                    {
+                                        if (game[i][j] == EMPTY)
+                                            printf("_");
+                                        else if ((game[i][j]) == (ARMED))
+                                            printf(".");
+                                        else if ((game[i][j]) == (DISARMED))
+                                            printf("*");
+                                    }
+
+                                    if (count > 0)
+                                    {
+                                        printf("\n");
+                                    }
+                                    count = 0;
+                                }
+                            }
+                            else
+                            {
+                                fputs("No mine at specified coordinate\n", stdout);
+                            }
                         }
                     }
+                    else
+                    {
+                        fputs("Invalid coordinate\n", stdout);
+                    }
                 }
-                else
+                if (checkRead == 1)
                 {
-                    fputs("Invalid coordinate\n", stdout);
+                    if ((posx >= 0 && posx <= xdim) && (posy >= 0 && posy < ydim))
+                    {
+                        // Verifica se existem números negativos
+                        if (posx < 0 || posx >= xdim)
+                        {
+                            fputs("Invalid input\n", stdout);
+                        }
+                        else if (posy < 0 || posy >= ydim)
+                        {
+                            fputs("Invalid input\n", stdout);
+                        }
+                        else
+                        {
+                            if (game[posx][posy] == DISARMED)
+                            {
+                                for (int i = 0; i < xdim; i++)
+                                {
+
+                                    for (int j = 0; j < ydim; j++)
+                                    {
+                                        if (game[i][j] == EMPTY)
+                                            printf("_");
+                                        else if ((game[i][j]) == (ARMED))
+                                            printf(".");
+                                        else if ((game[i][j]) == (DISARMED))
+                                            printf("*");
+                                    }
+
+                                    if (count > 0)
+                                    {
+                                        printf("\n");
+                                    }
+                                }
+                                trigger(game, posx, posy, logPos, logCount, count, xdim, ydim);
+                            }
+                            else
+                            {
+                                fputs("No mine at specified coordinate\n",stdout);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        fputs("Invalid coordinate\n", stdout);
+                    }
                 }
             }
             // recebe coordenadas x e y e põe uma mina em estado "armed"
@@ -158,25 +455,52 @@ void choices(char game[][MAX])
             {
                 int posx, posy;
                 scanf("%d%d", &posx, &posy);
-
-                if ((posx >= 0 && posx < MAX) && (posy >= 0 && posy < MAX))
+                if (checkRead == 0)
                 {
-                    count++;
-                    for (int i = 0; i < MAX; i++)
+                    if ((posx >= 0 && posx < MAX) && (posy >= 0 && posy < MAX))
                     {
-                        for (int j = 0; j < MAX; j++)
+                        count++;
+                        for (int i = 0; i < MAX; i++)
                         {
-                            if ((game[i][j] == DISARMED) && (game[i][j] == game[posx][posy]))
+                            for (int j = 0; j < MAX; j++)
                             {
-                                game[posx][posy] = ARMED;
+                                if ((game[i][j] == DISARMED) && (game[i][j] == game[posx][posy]))
+                                {
+                                    game[posx][posy] = ARMED;
+                                }
+                                if ((game[i][j] == ARMED) && (game[i][j] == game[posx][posy]))
+                                {
+                                    game[posx][posy] = ARMED;
+                                }
+                                if ((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy]))
+                                {
+                                    game[posx][posy] = ARMED;
+                                }
                             }
-                            if ((game[i][j] == ARMED) && (game[i][j] == game[posx][posy]))
+                        }
+                    }
+                }
+                if (checkRead == 1)
+                {
+                    if ((posx >= 0 && posx < xdim) && (posy >= 0 && posy < ydim))
+                    {
+                        count++;
+                        for (int i = 0; i < xdim; i++)
+                        {
+                            for (int j = 0; j < ydim; j++)
                             {
-                                game[posx][posy] = ARMED;
-                            }
-                            if ((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy]))
-                            {
-                                game[posx][posy] = ARMED;
+                                if ((game[i][j] == DISARMED) && (game[i][j] == game[posx][posy]))
+                                {
+                                    game[posx][posy] = ARMED;
+                                }
+                                if ((game[i][j] == ARMED) && (game[i][j] == game[posx][posy]))
+                                {
+                                    game[posx][posy] = ARMED;
+                                }
+                                if ((game[i][j] == EMPTY) && (game[i][j] == game[posx][posy]))
+                                {
+                                    game[posx][posy] = ARMED;
+                                }
                             }
                         }
                     }
@@ -210,12 +534,23 @@ void choices(char game[][MAX])
                 int posx, posy;
 
                 scanf("%d%d", &posx, &posy);
-
-                if ((posx >= 0) && (posx < MAX) && (posy >= 0) && (posy < MAX) && (game[posx][posy] == ARMED))
+                if (checkRead == 0)
                 {
-                    game[posx][posy] = DISARMED;
-                    printf("%d [%d, %d]\n", time, posx, posy);
-                    logFunc(game, posx, posy, time, logPos, 0);
+                    if ((posx >= 0) && (posx < MAX) && (posy >= 0) && (posy < MAX) && (game[posx][posy] == ARMED))
+                    {
+                        game[posx][posy] = DISARMED;
+                        printf("%d [%d, %d]\n", time, posx, posy);
+                        logFunc(game, posx, posy, time, logPos, 0);
+                    }
+                }
+                if (checkRead == 1)
+                {
+                    if ((posx >= 0) && (posx < xdim) && (posy >= 0) && (posy < ydim) && (game[posx][posy] == ARMED))
+                    {
+                        game[posx][posy] = DISARMED;
+                        printf("%d [%d, %d]\n", time, posx, posy);
+                        logFunc(game, posx, posy, time, logPos, 0);
+                    }
                 }
             }
             else
@@ -226,92 +561,228 @@ void choices(char game[][MAX])
 
     } while (i != 0);
 }
-/*
-void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount)
+
+void trigger(char game[][MAX], int x, int y, int logPos[625], int logCount, int count, int xdim, int ydim)
 {
+    // Se houver log vai limpar as posições
     if (logCount > 0)
     {
+        logCount--;
+
         for (int i = 0; i < 98; i++)
         {
             logPos[i] = logPos[i + 2];
         }
-
-        logCount--;
     }
 
-    // Verifica os lados da bomba
-    for (int i = -1; i < 2; i++)
+    // Verifica a direita
+    if (game[x][y + 1] == ARMED)
     {
-        for (int j = -1; j < 2; j++)
+        game[x][y + 1] = DISARMED;
+        saveTrigger(x, y + 1, logPos, logCount);
+        logCount++;
+        // Show
+        for (int i = 0; i < xdim; i++)
         {
 
-            // Posição da bomba inicial
-            if ((i == 0 && j == 0) || (i != 0 && j != 0))
+            for (int j = 0; j < ydim; j++)
             {
-                // continua
-                continue;
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
             }
-            // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
+            if (count > 0)
             {
-                // Vai para o else
-                continue;
+                printf("\n");
             }
-            // Se está tudo certo rebenta as que estão a volta
-            else
-            {
+        }
+    }
+    // Verifica a esquerda
+    if (game[x][y - 1] == ARMED)
+    {
+        game[x][y - 1] = DISARMED;
+        saveTrigger(x, y - 1, logPos, logCount);
+        logCount++;
+        for (int i = 0; i < xdim; i++)
+        {
 
-                if (game[x + i][y + j] == ARMED)
-                {
-                    game[x + i][y + j] = DISARMED;
-                    // Guarda a posição das adjacentes, x
-                    logPos[logCount * 2] = x + i;
-                    // Guarda a posição das adjacentes, y
-                    logPos[logCount * 2 + 1] = y + j;
-                    logCount++;
-                }
+            for (int j = 0; j < ydim; j++)
+            {
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
+            }
+            if (count > 0)
+            {
+                printf("\n");
+            }
+        }
+    }
+    // Verifica em baixo
+    if (game[x - 1][y] == ARMED)
+    {
+        game[x - 1][y] = DISARMED;
+
+        saveTrigger(x - 1, y, logPos, logCount);
+        logCount++;
+        for (int i = 0; i < xdim; i++)
+        {
+
+            for (int j = 0; j < ydim; j++)
+            {
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
+            }
+            if (count > 0)
+            {
+                printf("\n");
+            }
+        }
+    }
+    // Verifica em cima
+    if (game[x + 1][y] == ARMED)
+    {
+        game[x + 1][y] = DISARMED;
+        saveTrigger(x + 1, y, logPos, logCount);
+        logCount++;
+        for (int i = 0; i < xdim; i++)
+        {
+
+            for (int j = 0; j < ydim; j++)
+            {
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
+            }
+            if (count > 0)
+            {
+                printf("\n");
+            }
+        }
+    }
+    // Verifica na diagonal esquerda em cima
+    if (game[x - 1][y - 1] == ARMED)
+    {
+        game[x - 1][y - 1] = DISARMED;
+        saveTrigger(x - 1, y - 1, logPos, logCount);
+        logCount++;
+        for (int i = 0; i < xdim; i++)
+        {
+
+            for (int j = 0; j < ydim; j++)
+            {
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
+            }
+            if (count > 0)
+            {
+                printf("\n");
+            }
+        }
+    }
+    // Verifica na diagonal esquerda em baixo
+    if (game[x + 1][y - 1] == ARMED)
+    {
+        game[x + 1][y - 1] = DISARMED;
+        saveTrigger(x + 1, y - 1, logPos, logCount);
+        logCount++;
+        for (int i = 0; i < xdim; i++)
+        {
+
+            for (int j = 0; j < ydim; j++)
+            {
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
+            }
+            if (count > 0)
+            {
+                printf("\n");
+            }
+        }
+    }
+    // Verifica na diagonal direita em cima
+    if (game[x + 1][y + 1] == ARMED)
+    {
+        game[x + 1][y + 1] = DISARMED;
+        saveTrigger(x + 1, y + 1, logPos, logCount);
+        logCount++;
+        for (int i = 0; i < xdim; i++)
+        {
+
+            for (int j = 0; j < ydim; j++)
+            {
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
+            }
+            if (count > 0)
+            {
+                printf("\n");
+            }
+        }
+    }
+    // Verifica na diagonal direita em baixo
+    if (game[x + 1][y - 1] == ARMED)
+    {
+        game[x + 1][y - 1] = DISARMED;
+        saveTrigger(x + 1, y - 1, logPos, logCount);
+        logCount++;
+        for (int i = 0; i < xdim; i++)
+        {
+
+            for (int j = 0; j < ydim; j++)
+            {
+                if (game[i][j] == EMPTY)
+                    printf("_");
+                else if ((game[i][j]) == (ARMED))
+                    printf(".");
+                else if ((game[i][j]) == (DISARMED))
+                    printf("*");
+            }
+            if (count > 0)
+            {
+                printf("\n");
             }
         }
     }
 
-    // Verifica todas as diagonais a volta da bomba
-    for (int i = -1; i < 2; i += 2)
+    if (logCount > 0)
     {
-        for (int j = -1; j < 2; j += 2)
-        {
+        trigger(game, logPos[0], logPos[1], logPos, logCount, count, xdim, ydim);
+    }
+}
 
-            // Posição da bomba inicial
-            if (i == 0 && j == 0)
-            {
-                // continua
-                continue;
-            }
-            // Verifica se está dentro Do mapa
-            else if ((x + i < 0) || (x + i > MAX) || (y + j < 0) || (y + j > MAX))
-            {
-                // Vai para o else
-                continue;
-            }
-            // Se está tudo certo rebenta as que estão a volta
-            else
-            {
-                if (game[x + i][y + j] == ARMED)
-                {
-                    game[x + i][y + j] = DISARMED;
-                    // guarda a posição e das bombas explodidas diagonal , x
-                    logPos[logCount * 2] = x + i;
-                    // guarda a posição e das bombas explodidas diagonal , y
-                    logPos[logCount * 2 + 1] = y + j;
-                    logCount++;
-                }
-            }
-        }
-    }
-    if (logCount)
-    {
-        trigger(game, logPos[0], logPos[1], logPos, logCount);
-    }
-} */
+void saveTrigger(int x, int y, int _logPos[], int _logCount)
+{
+    // Guarda o x e y, e imprime
+    // para nao guardar um em cima do outro
+    _logPos[_logCount * 2] = x;
+    _logPos[_logCount * 2 + 1] = y;
+}
 
 void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount)
 {
@@ -397,242 +868,18 @@ void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logC
     }
 }
 
+// Guarda as posições para depois limpar
 void saveLog(int x, int y, int _logPos[], int _logCount, int time)
 {
+    // Guarda o x e y, e imprime
+    // para nao guardar um em cima do outro
     _logPos[_logCount * 2] = x;
     _logPos[_logCount * 2 + 1] = y;
     printf("%d [%d, %d]\n", time, x, y);
 }
 
-
-
-// Lê o ficheiro
-void readFile(char filename[200], char grid[][MAX])
-{
-    char ch;
-    // Variavel que recebe a posição x
-    int chx;
-    int hasx;
-    // Variavel que recebe a posição y
-    int chy;
-    int hasy;
-    // Variaveis que vão receber as posições do array
-    int currentNum;
-    int turn;
-    int i, j;
-    int corrupted = 0;
-
-    char xdim, ydim;
-
-    //Apontador para o ficheiro
-    FILE *file;
-
-    //Abre o ficheiro
-    file = fopen(filename, "r");
-
-    // Verifica se o ficheiro é valido
-    if (file == NULL)
-    {
-        fputs("Error opening file\n", stdout);
-        choices(grid);
-    }
-    else
-    {
-        // Se o ficheiro for valido lê as posições que estão ficheiro
-        // e aplica no array
-
-        turn = 0;
-        chx = 0;
-        chy = 0;
-        hasx = 0;
-        hasy = 0;
-
-        // recebe as posições das minas
-        while (1)
-        {
-            if (fscanf(file, "%c", &ch) != EOF)
-            {
-                currentNum = ch - 48;
-
-                if ((ch != ' ') && (ch != '\n') && (ch != '\t'))
-                {
-                    if ((currentNum < 0) || (currentNum > 9))
-                    {
-                        fputs("File is corrupted\n", stdout);
-                        corrupted = 1;
-                        break;
-                    }
-                }
-
-                if (turn == 0)
-                {
-                    if (ch == '\n')
-                    {
-                        if (hasx && !corrupted)
-                        {
-                            fputs("File is corrupted\n", stdout);
-                            corrupted = 1;
-                            break;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-
-                    else if ((ch == ' ') || (ch == '\t'))
-                    {
-                        if (hasx)
-                        {
-                            turn = 1;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        if (chx == 0)
-                        {
-                            chx = ch - 48;
-                            hasx = 1;
-                        }
-
-                        else
-                        {
-                            chx *= 10;
-                            chx += ch - 48;
-                            hasx = 1;
-
-                            if (chx >= 25)
-                            {
-                                hasx = 0;
-                                hasy = 0;
-
-                                if (!corrupted)
-                                {
-                                    fputs("File is corrupted\n", stdout);
-                                    corrupted = 1;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                else if (turn == 1)
-                {
-                    if ((ch == ' ') || (ch == '\t'))
-                    {
-                        if (hasy)
-                        {
-                            grid[chx][chy] = ARMED;
-
-                            turn = 0;
-                            chx = 0;
-                            chy = 0;
-                            hasx = 0;
-                            hasy = 0;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (ch == '\n')
-                    {
-                        if (hasy)
-                        {
-                            grid[chx][chy] = ARMED;
-
-                            turn = 0;
-                            chx = 0;
-                            chy = 0;
-                            hasx = 0;
-                            hasy = 0;
-                        }
-
-                        else if (!corrupted)
-                        {
-                            fputs("File is corrupted\n", stdout);
-                            corrupted = 1;
-                            break;
-                        }
-
-                        turn = 0;
-                        chx = 0;
-                        chy = 0;
-                        hasx = 0;
-                        hasy = 0;
-                    }
-                    else
-                    {
-                        if (chy == 0)
-                        {
-                            chy = ch - 48;
-                            hasy = 1;
-                        }
-
-                        else
-                        {
-                            chy *= 10;
-                            chy += ch - 48;
-                            hasy = 1;
-
-                            if (chy >= 25)
-                            {
-                                hasx = 0;
-                                hasy = 0;
-
-                                if (!corrupted)
-                                {
-                                    fputs("File is corrupted\n", stdout);
-                                    corrupted = 1;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (turn == 0)
-                {
-                    if (hasx && !corrupted)
-                    {
-                        fputs("File is corrupted6\n", stdout);
-                        corrupted = 1;
-                        break;
-                    }
-                }
-                else if (turn == 1)
-                {
-                    if (hasy)
-                    {
-                        grid[chx][chy] = ARMED;
-                    }
-                    else
-                    {
-                        if (!corrupted)
-                        {
-                            fputs("File is corrupted7\n", stdout);
-                            corrupted = 1;
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
-    // Fecha o ficheiro
-    fclose(file);
-}
-
 // cria um ficheiro novo
-void writeFile(char filenameout[200], char grid[][MAX])
+void writeFile(char filenameout[200], char game[][MAX])
 {
 
     // Apontador para o ficheiro
@@ -646,7 +893,7 @@ void writeFile(char filenameout[200], char grid[][MAX])
     if (file == NULL)
     {
         fputs("Error opening the file\n", stdout);
-        choices(grid);
+        choices(game);
     }
     // Abre a grelha
 
@@ -659,13 +906,13 @@ void writeFile(char filenameout[200], char grid[][MAX])
             for (j = 0; j < MAX; j++)
             {
                 // Bombas armadas no array(posições)
-                if (grid[i][j] == ARMED)
+                if (game[i][j] == ARMED)
                 {
                     // Escreve no ficheiro as posições das bombas armadas
                     fprintf(file, "%d %d\n", i, j);
                 }
                 // Bombas desarmadas no array(posições)
-                if (grid[i][j] == DISARMED)
+                if (game[i][j] == DISARMED)
                 {
                     // Escreve no ficheiro as posições das bombas desarmadas
                     fprintf(file, "%d %d\n", i, j);
