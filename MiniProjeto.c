@@ -786,6 +786,7 @@ void saveTrigger(int x, int y, int _logPos[], int _logCount)
 
 void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logCount)
 {
+    time++;
     // Se houver log vai limpar as posições
     if (logCount > 0)
     {
@@ -796,69 +797,70 @@ void logFunc(char game[][MAX], int x, int y, int time, int logPos[625], int logC
             logPos[i] = logPos[i + 2];
         }
     }
+    int counter = 0;
 
     // Verifica a direita
     if (game[x][y + 1] == ARMED)
     {
         game[x][y + 1] = DISARMED;
-        time += 10;
         saveLog(x, y + 1, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 10, x, y);
         logCount++;
     }
     // Verifica a esquerda
     if (game[x][y - 1] == ARMED)
     {
         game[x][y - 1] = DISARMED;
-        time += 10;
         saveLog(x, y - 1, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 10, x, y);
         logCount++;
     }
     // Verifica em baixo
     if (game[x - 1][y] == ARMED)
     {
         game[x - 1][y] = DISARMED;
-        time += 10;
         saveLog(x - 1, y, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 10, x, y);
         logCount++;
     }
     // Verifica em cima
     if (game[x + 1][y] == ARMED)
     {
         game[x + 1][y] = DISARMED;
-        time += 10;
         saveLog(x + 1, y, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 10, x, y);
         logCount++;
     }
     // Verifica na diagonal esquerda em cima
     if (game[x - 1][y - 1] == ARMED)
     {
         game[x - 1][y - 1] = DISARMED;
-        time += 15;
         saveLog(x - 1, y - 1, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 15, x, y);
         logCount++;
     }
     // Verifica na diagonal esquerda em baixo
     if (game[x + 1][y - 1] == ARMED)
     {
         game[x + 1][y - 1] = DISARMED;
-        time += 15;
         saveLog(x + 1, y - 1, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 15, x, y);
         logCount++;
     }
     // Verifica na diagonal direita em cima
     if (game[x + 1][y + 1] == ARMED)
     {
         game[x + 1][y + 1] = DISARMED;
-        time += 15;
         saveLog(x + 1, y + 1, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 15, x, y);
         logCount++;
     }
     // Verifica na diagonal direita em baixo
     if (game[x + 1][y - 1] == ARMED)
     {
         game[x + 1][y - 1] = DISARMED;
-        time += 15;
         saveLog(x + 1, y - 1, logPos, logCount, time);
+        printf("%d [%d, %d]\n", time * 15, x, y);
         logCount++;
     }
 
@@ -875,7 +877,6 @@ void saveLog(int x, int y, int _logPos[], int _logCount, int time)
     // para nao guardar um em cima do outro
     _logPos[_logCount * 2] = x;
     _logPos[_logCount * 2 + 1] = y;
-    printf("%d [%d, %d]\n", time, x, y);
 }
 
 // cria um ficheiro novo
@@ -923,4 +924,3 @@ void writeFile(char filenameout[200], char game[][MAX])
         fclose(file);
     }
 }
-
