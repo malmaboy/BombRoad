@@ -636,6 +636,7 @@ void logFunc(char** game, int x, int y, int time, int logPos[625], int logCount,
 /*
 void readFile(char filename[200], char** grid, int* row, int* col)
 {
+
     char ch;
     // Variavel que recebe a posição x
     int chx;
@@ -658,6 +659,7 @@ void readFile(char filename[200], char** grid, int* row, int* col)
     if (file == NULL)
     {
         fputs("Error opening file\n", stdout);
+
     }
     else
     {
@@ -679,6 +681,7 @@ void readFile(char filename[200], char** grid, int* row, int* col)
             {
                 currentNum = ch - 48;
 
+
                 if ((ch != ' ') && (ch != '\n') && (ch != '\t'))
                 {
                     if ((currentNum < 0) || (currentNum > 9))
@@ -688,7 +691,6 @@ void readFile(char filename[200], char** grid, int* row, int* col)
                         break;
                     }
                 }
-
                 if (turn == 0)
                 {
                     if (ch == '\n')
